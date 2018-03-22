@@ -6,6 +6,6 @@ package com.method.invoke.base;
  * @author zhuzhenke
  * @date 2018/03/20
  */
-public class BaseResponse {
+public interface BaseResponse {
 
 }

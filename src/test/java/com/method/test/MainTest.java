@@ -1,6 +1,5 @@
 package com.method.test;
 
-
 import com.method.invoke.DefaultAttachment;
 import com.method.invoke.DefaultNextInvokeProcessor;
 import com.method.invoke.ExceptionReInvokeProcessor;
@@ -25,9 +24,9 @@ public class MainTest {
 
     private static void eeeDubble() throws Exception {
         long start = System.currentTimeMillis();
-        AmazonClient amazonClient = new AmazonClient();
-        amazonClient.setGlobalNextInvokeProcessor(new DefaultNextInvokeProcessor());
-        amazonClient.setGlobalExceptionReInvokeProcessor(new ExceptionReInvokeProcessor() {
+        AmazonTestClient amazonTestClient = new AmazonTestClient();
+        amazonTestClient.setGlobalNextInvokeProcessor(new DefaultNextInvokeProcessor());
+        amazonTestClient.setGlobalExceptionReInvokeProcessor(new ExceptionReInvokeProcessor() {
             @Override
             public boolean needReInvoke(Exception e) {
                 if (e.getMessage().contains("授权异常")) {
@@ -38,11 +37,11 @@ public class MainTest {
         });
 
         AmazonOrderRequest amazonOrderRequest = new AmazonOrderRequest();
-        AmazonOrderResponse response = (AmazonOrderResponse) amazonClient.execute(amazonOrderRequest);
+        AmazonOrderResponse response = (AmazonOrderResponse) amazonTestClient.execute(amazonOrderRequest);
         System.out.println("response Time:" + (System.currentTimeMillis() - start) + ";result:" + response.getResult());
 
         AmazonProductRequest amazonProductRequest = new AmazonProductRequest();
-        AmazonProductResponse amazonProductResponse = (AmazonProductResponse) amazonClient.execute(amazonProductRequest);
+        AmazonProductResponse amazonProductResponse = (AmazonProductResponse) amazonTestClient.execute(amazonProductRequest);
         System.out.println("amazonProductResponse Time:" + (System.currentTimeMillis() - start) + ";result:" + amazonProductResponse.getResult());
 
 
@@ -51,9 +50,9 @@ public class MainTest {
 
     public static void eee() throws Exception {
         long start = System.currentTimeMillis();
-        AmazonClient amazonClient = new AmazonClient();
-        amazonClient.setGlobalNextInvokeProcessor(new DefaultNextInvokeProcessor());
-        amazonClient.setGlobalExceptionReInvokeProcessor(new ExceptionReInvokeProcessor() {
+        AmazonTestClient amazonTestClient = new AmazonTestClient();
+        amazonTestClient.setGlobalNextInvokeProcessor(new DefaultNextInvokeProcessor());
+        amazonTestClient.setGlobalExceptionReInvokeProcessor(new ExceptionReInvokeProcessor() {
             @Override
             public boolean needReInvoke(Exception e) {
                 if (e.getMessage().contains("授权异常")) {
@@ -64,15 +63,15 @@ public class MainTest {
         });
 
         AmazonOrderRequest amazonOrderRequest = new AmazonOrderRequest();
-        AmazonOrderResponse response = (AmazonOrderResponse) amazonClient.execute(amazonOrderRequest);
+        AmazonOrderResponse response = (AmazonOrderResponse) amazonTestClient.execute(amazonOrderRequest);
         System.out.println(System.currentTimeMillis() - start);
     }
 
     public static void eeeItem() throws Exception {
         long start = System.currentTimeMillis();
-        AmazonClient amazonClient = new AmazonClient();
-        amazonClient.setGlobalNextInvokeProcessor(new DefaultNextInvokeProcessor());
-        amazonClient.setGlobalExceptionReInvokeProcessor(new ExceptionReInvokeProcessor() {
+        AmazonTestClient amazonTestClient = new AmazonTestClient();
+        amazonTestClient.setGlobalNextInvokeProcessor(new DefaultNextInvokeProcessor());
+        amazonTestClient.setGlobalExceptionReInvokeProcessor(new ExceptionReInvokeProcessor() {
             @Override
             public boolean needReInvoke(Exception e) {
                 if (e.getMessage().contains("授权异常")) {
@@ -83,16 +82,16 @@ public class MainTest {
         });
 
         AmazonOrderRequest amazonOrderRequest = new AmazonOrderRequest();
-        AmazonOrderResponse response = (AmazonOrderResponse) amazonClient.execute(amazonOrderRequest);
+        AmazonOrderResponse response = (AmazonOrderResponse) amazonTestClient.execute(amazonOrderRequest);
         System.out.println(System.currentTimeMillis() - start);
     }
 
 
     public static void eeeCallBack() throws Exception {
         long start = System.currentTimeMillis();
-        AmazonClient amazonClient = new AmazonClient();
-        amazonClient.setGlobalNextInvokeProcessor(new DefaultNextInvokeProcessor());
-        amazonClient.setGlobalExceptionReInvokeProcessor(new ExceptionReInvokeProcessor() {
+        AmazonTestClient amazonTestClient = new AmazonTestClient();
+        amazonTestClient.setGlobalNextInvokeProcessor(new DefaultNextInvokeProcessor());
+        amazonTestClient.setGlobalExceptionReInvokeProcessor(new ExceptionReInvokeProcessor() {
             @Override
             public boolean needReInvoke(Exception e) {
                 if (e.getMessage().contains("授权异常")) {
@@ -107,7 +106,7 @@ public class MainTest {
 
         DefaultAttachment defaultAttachment = new DefaultAttachment();
         defaultAttachment.put("a", "aaa");
-        amazonClient.execute(amazonOrderRequest, new InvokeCallBack() {
+        amazonTestClient.execute(amazonOrderRequest, new InvokeCallBack() {
             @Override
             public void invokeResult(BaseResponse response, DefaultAttachment defaultAttachment, Exception e) {
                 if (e != null) {

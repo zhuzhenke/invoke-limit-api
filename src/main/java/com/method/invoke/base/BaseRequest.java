@@ -6,9 +6,6 @@ package com.method.invoke.base;
  * @author zhuzhenke
  * @date 2018/03/20
  */
-public class BaseRequest<T extends BaseResponse> {
+public interface BaseRequest {
 
-    public void checkParams() throws Exception {
-
-    }
 }

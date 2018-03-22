@@ -1,6 +1,5 @@
 package com.method.test.amazon.api;
 
-
 import com.method.invoke.base.BaseClient;
 import com.method.invoke.base.BaseRequest;
 import com.method.invoke.base.BaseResponse;
@@ -9,7 +8,7 @@ import com.method.invoke.base.BaseResponse;
  * @author zhuzhenke
  * @date 2018/03/20
  */
-public class AmazonClient extends BaseClient {
+public class AmazonTestClient extends BaseClient {
     int i = 0;
 
     /**

@@ -1,6 +1,5 @@
 package com.method.invoke;
 
-
 import com.method.invoke.base.BaseResponse;
 import com.method.invoke.exec.InvokeThreadFactory;
 import org.slf4j.Logger;
@@ -22,15 +21,19 @@ public class DefaultSystemInvoke implements SystemInvoke {
 
     private volatile boolean initExecutorServiceFlag = false;
     private ExecutorService executorService = null;
+    private static DefaultSystemInvoke defaultSystemInvoke = new DefaultSystemInvoke();
 
-    public DefaultSystemInvoke() {
+    private DefaultSystemInvoke() {
 
+    }
+
+    public static SystemInvoke getDefaultSystemInvoke() {
+        return defaultSystemInvoke;
     }
 
     private void init() {
         synchronized (this) {
             if (!initExecutorServiceFlag) {
-                executorService = Executors.newCachedThreadPool();
                 executorService = new ThreadPoolExecutor(5, 50,
                         600L, TimeUnit.SECONDS,
                         new LinkedBlockingQueue<Runnable>(),
@@ -136,7 +139,7 @@ public class DefaultSystemInvoke implements SystemInvoke {
             throw new Exception("reInvokeException can not be null");
         }
         //用户参数校验
-        requestCommand.getBaseRequest().checkParams();
+//        requestCommand.getBaseRequest().checkParams();
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.method.invoke.base;
 
-
 import com.method.invoke.*;
 import com.method.invoke.callback.InvokeCallBack;
 
@@ -38,7 +37,7 @@ public abstract class BaseClient {
         requestCommand.setBaseRequest(baseRequest);
         requestCommand.setBaseClient(this);
 
-        SystemInvoke systemInvoke = new DefaultSystemInvoke();
+        SystemInvoke systemInvoke = DefaultSystemInvoke.getDefaultSystemInvoke();
         return systemInvoke.execute(requestCommand);
     }
 
@@ -56,7 +55,7 @@ public abstract class BaseClient {
         requestCommand.setInvokeCallBack(invokeCallBack);
         requestCommand.setDefaultAttachment(defaultAttachment);
 
-        SystemInvoke systemInvoke = new DefaultSystemInvoke();
+        SystemInvoke systemInvoke = DefaultSystemInvoke.getDefaultSystemInvoke();
         systemInvoke.execute(requestCommand);
     }
 
@@ -79,7 +78,7 @@ public abstract class BaseClient {
         requestCommand.setBaseRequest(baseRequest);
         requestCommand.setBaseClient(this);
 
-        SystemInvoke systemInvoke = new DefaultSystemInvoke();
+        SystemInvoke systemInvoke = DefaultSystemInvoke.getDefaultSystemInvoke();
         return systemInvoke.execute(requestCommand);
     }
 
@@ -107,10 +106,17 @@ public abstract class BaseClient {
         requestCommand.setInvokeCallBack(invokeCallBack);
         requestCommand.setDefaultAttachment(defaultAttachment);
 
-        SystemInvoke systemInvoke = new DefaultSystemInvoke();
+        SystemInvoke systemInvoke = DefaultSystemInvoke.getDefaultSystemInvoke();
         systemInvoke.execute(requestCommand);
     }
 
+    /**
+     * 用户内部实现
+     *
+     * @param baseRequest 请求类
+     * @return BaseResponse响应
+     * @throws Exception 异常
+     */
     public abstract BaseResponse executeInternal(BaseRequest baseRequest) throws Exception;
 
 }
