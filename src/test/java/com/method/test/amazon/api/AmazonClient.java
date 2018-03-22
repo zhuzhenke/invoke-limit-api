@@ -12,14 +12,31 @@ import com.method.invoke.base.BaseResponse;
 public class AmazonClient extends BaseClient {
     int i = 0;
 
+    /**
+     * 复用同一个client
+     */
     @Override
     public BaseResponse executeInternal(BaseRequest baseRequest) throws Exception {
-        System.out.println("invoke baseRequest..." + i);
-        AmazonResponse amazonResponse = new AmazonResponse();
-        amazonResponse.setResult("finish");
-        i++;
-        if (i == 10) {
-            return amazonResponse;
+        if (baseRequest instanceof AmazonOrderRequest) {
+            System.out.println("invoke AmazonOrderRequest..." + i);
+            AmazonOrderResponse amazonOrderResponse = new AmazonOrderResponse();
+            amazonOrderResponse.setResult("AmazonOrderRequest finish");
+            i++;
+            if (i == 10) {
+                return amazonOrderResponse;
+            } else {
+                throw new Exception("授权异常了");
+            }
+        } else if (baseRequest instanceof AmazonProductRequest) {
+            System.out.println("invoke AmazonProductRequest..." + i);
+            AmazonProductResponse amazonProductResponse = new AmazonProductResponse();
+            amazonProductResponse.setResult("AmazonProductRequest finish");
+            i++;
+            if (i == 15) {
+                return amazonProductResponse;
+            } else {
+                throw new Exception("授权异常了");
+            }
         } else {
             throw new Exception("授权异常了");
         }

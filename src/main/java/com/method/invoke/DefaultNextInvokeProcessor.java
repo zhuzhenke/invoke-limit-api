@@ -11,6 +11,7 @@ public class DefaultNextInvokeProcessor implements NextInvokeProcessor {
 
     @Override
     public final Long getNextInvokeTimeMillis() {
+
         long nextInvokeTimeMillis = System.currentTimeMillis() + 2000;
         long curTime = System.currentTimeMillis();
         if (nextInvokeTimeMillis < curTime) {

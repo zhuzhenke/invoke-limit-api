@@ -1,5 +1,6 @@
 package com.method.invoke;
 
+
 import com.method.invoke.base.BaseResponse;
 
 /**

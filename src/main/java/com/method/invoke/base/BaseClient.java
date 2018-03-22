@@ -11,81 +11,106 @@ import com.method.invoke.callback.InvokeCallBack;
  * @date 2018/03/20
  */
 public abstract class BaseClient {
-    //重试时间处理
-    NextInvokeProcessor nextInvokeProcessor;
-    //异常重试处理器
-    ExceptionReInvokeProcessor exceptionReInvokeProcessor;
+    /**
+     * 全局重试时间处理
+     */
+    private NextInvokeProcessor globalNextInvokeProcessor;
+    /**
+     * 全局异常重试处理器
+     */
+    private ExceptionReInvokeProcessor globalExceptionReInvokeProcessor;
 
-    public void setExceptionReInvokeProcessor(ExceptionReInvokeProcessor exceptionReInvokeProcessor) {
-        this.exceptionReInvokeProcessor = exceptionReInvokeProcessor;
+    public void setGlobalExceptionReInvokeProcessor(ExceptionReInvokeProcessor globalExceptionReInvokeProcessor) {
+        this.globalExceptionReInvokeProcessor = globalExceptionReInvokeProcessor;
     }
 
-    public void setNextInvokeProcessor(NextInvokeProcessor nextInvokeProcessor) {
-        this.nextInvokeProcessor = nextInvokeProcessor;
+    public void setGlobalNextInvokeProcessor(NextInvokeProcessor globalNextInvokeProcessor) {
+        this.globalNextInvokeProcessor = globalNextInvokeProcessor;
     }
 
     /**
-     * 使用全局重试处理器
+     * 同步方法且使用全局重试处理器
      */
     public BaseResponse execute(BaseRequest baseRequest) throws Exception {
-        if (baseRequest.isSubmit()) {
-            RequestCommand requestCommand = new RequestCommand();
-            requestCommand.setNextInvokeProcessor(nextInvokeProcessor);
-            requestCommand.setExceptionReInvokeProcessor(exceptionReInvokeProcessor);
-            requestCommand.setBaseRequest(baseRequest);
-            requestCommand.setBaseClient(this);
+        RequestCommand requestCommand = new RequestCommand();
+        requestCommand.setNextInvokeProcessor(globalNextInvokeProcessor);
+        requestCommand.setExceptionReInvokeProcessor(globalExceptionReInvokeProcessor);
+        requestCommand.setBaseRequest(baseRequest);
+        requestCommand.setBaseClient(this);
 
-            SystemInvoke systemInvoke = new DefaultSystemInvoke();
-            baseRequest.closeSubmit();
-            return systemInvoke.execute(requestCommand);
-        } else {
-            return executeInternal(baseRequest);
-        }
+        SystemInvoke systemInvoke = new DefaultSystemInvoke();
+        return systemInvoke.execute(requestCommand);
     }
 
     /**
-     * 使用全局重试处理器
+     * 异步方法且使用全局重试处理器
      */
     public void execute(BaseRequest baseRequest, InvokeCallBack invokeCallBack, DefaultAttachment defaultAttachment) throws Exception {
-        if (baseRequest.isSubmit()) {
-            RequestCommand requestCommand = new RequestCommand();
-            requestCommand.setNextInvokeProcessor(nextInvokeProcessor);
-            requestCommand.setExceptionReInvokeProcessor(exceptionReInvokeProcessor);
-            requestCommand.setBaseRequest(baseRequest);
-            requestCommand.setBaseClient(this);
+        RequestCommand requestCommand = new RequestCommand();
+        requestCommand.setNextInvokeProcessor(globalNextInvokeProcessor);
+        requestCommand.setExceptionReInvokeProcessor(globalExceptionReInvokeProcessor);
+        requestCommand.setBaseRequest(baseRequest);
+        requestCommand.setBaseClient(this);
 
-            //设置回调
-            requestCommand.setInvokeCallBack(invokeCallBack);
-            requestCommand.setDefaultAttachment(defaultAttachment);
+        //设置回调
+        requestCommand.setInvokeCallBack(invokeCallBack);
+        requestCommand.setDefaultAttachment(defaultAttachment);
 
-            SystemInvoke systemInvoke = new DefaultSystemInvoke();
-            baseRequest.closeSubmit();
-            systemInvoke.execute(requestCommand);
-        } else {
-            executeInternal(baseRequest);
-        }
+        SystemInvoke systemInvoke = new DefaultSystemInvoke();
+        systemInvoke.execute(requestCommand);
     }
 
     /**
-     * 使用当前重试处理器
+     * 同步方法且使用当前重试处理器
      */
     public BaseResponse execute(BaseRequest baseRequest, NextInvokeProcessor nextInvokeProcessor,
                                 ExceptionReInvokeProcessor exceptionReInvokeProcessor) throws Exception {
-        if (baseRequest.isSubmit()) {
-            RequestCommand requestCommand = new RequestCommand();
+        RequestCommand requestCommand = new RequestCommand();
+        if (nextInvokeProcessor != null) {
             requestCommand.setNextInvokeProcessor(nextInvokeProcessor);
-            requestCommand.setExceptionReInvokeProcessor(exceptionReInvokeProcessor);
-            requestCommand.setBaseRequest(baseRequest);
-            requestCommand.setBaseClient(this);
-
-            SystemInvoke systemInvoke = new DefaultSystemInvoke();
-            baseRequest.closeSubmit();
-            return systemInvoke.execute(requestCommand);
         } else {
-            return executeInternal(baseRequest);
+            requestCommand.setNextInvokeProcessor(globalNextInvokeProcessor);
         }
+        if (nextInvokeProcessor != null) {
+            requestCommand.setExceptionReInvokeProcessor(exceptionReInvokeProcessor);
+        } else {
+            requestCommand.setExceptionReInvokeProcessor(globalExceptionReInvokeProcessor);
+        }
+        requestCommand.setBaseRequest(baseRequest);
+        requestCommand.setBaseClient(this);
+
+        SystemInvoke systemInvoke = new DefaultSystemInvoke();
+        return systemInvoke.execute(requestCommand);
     }
 
-    protected abstract BaseResponse executeInternal(BaseRequest baseRequest) throws Exception;
+    /**
+     * 异步方法且使用全局重试处理器
+     */
+    public void execute(BaseRequest baseRequest, InvokeCallBack invokeCallBack,
+                        DefaultAttachment defaultAttachment, NextInvokeProcessor nextInvokeProcessor,
+                        ExceptionReInvokeProcessor exceptionReInvokeProcessor) throws Exception {
+        RequestCommand requestCommand = new RequestCommand();
+        if (nextInvokeProcessor != null) {
+            requestCommand.setNextInvokeProcessor(nextInvokeProcessor);
+        } else {
+            requestCommand.setNextInvokeProcessor(globalNextInvokeProcessor);
+        }
+        if (nextInvokeProcessor != null) {
+            requestCommand.setExceptionReInvokeProcessor(exceptionReInvokeProcessor);
+        } else {
+            requestCommand.setExceptionReInvokeProcessor(globalExceptionReInvokeProcessor);
+        }
+        requestCommand.setBaseRequest(baseRequest);
+        requestCommand.setBaseClient(this);
+
+        //设置回调
+        requestCommand.setInvokeCallBack(invokeCallBack);
+        requestCommand.setDefaultAttachment(defaultAttachment);
+
+        SystemInvoke systemInvoke = new DefaultSystemInvoke();
+        systemInvoke.execute(requestCommand);
+    }
+
+    public abstract BaseResponse executeInternal(BaseRequest baseRequest) throws Exception;
 
 }

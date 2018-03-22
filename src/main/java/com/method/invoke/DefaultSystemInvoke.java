@@ -1,7 +1,6 @@
 package com.method.invoke;
 
 
-import com.method.invoke.base.BaseRequest;
 import com.method.invoke.base.BaseResponse;
 import com.method.invoke.exec.InvokeThreadFactory;
 import org.slf4j.Logger;
@@ -65,12 +64,6 @@ public class DefaultSystemInvoke implements SystemInvoke {
         return requestCommand.getBaseResponse();
     }
 
-    private RequestCommand createBaseQuest(BaseRequest baseRequest) {
-        RequestCommand requestCommand = new RequestCommand();
-
-        return requestCommand;
-    }
-
     private void checkException(final RequestCommand requestCommand) throws Exception {
         if (requestCommand.getException() != null) {
             throw requestCommand.getException();
@@ -94,7 +87,7 @@ public class DefaultSystemInvoke implements SystemInvoke {
         BaseResponse baseResponse = null;
         boolean finish = false;
         try {
-            baseResponse = requestCommand.getBaseClient().execute(requestCommand.getBaseRequest(), requestCommand.getNextInvokeProcessor(), requestCommand.getExceptionReInvokeProcessor());
+            baseResponse = requestCommand.getBaseClient().executeInternal(requestCommand.getBaseRequest());
             finish = true;
         } catch (Exception e) {
             logger.error("businessClient({}).execute({}) error", requestCommand.getBaseClient().getClass(), requestCommand.getClass(), e);
