@@ -1,5 +1,6 @@
 package com.method.test.amazon.api;
 
+import com.amazon.commom.MarketPlace;
 import com.method.invoke.base.BaseClient;
 import com.method.invoke.base.BaseRequest;
 import com.method.invoke.base.BaseResponse;
@@ -15,7 +16,7 @@ public class AmazonTestClient extends BaseClient {
      * 复用同一个client
      */
     @Override
-    public BaseResponse executeInternal(BaseRequest baseRequest) throws Exception {
+    public BaseResponse executeInternal(BaseRequest baseRequest, MarketPlace marketPlace) throws Exception {
         if (baseRequest instanceof AmazonOrderRequest) {
             System.out.println("invoke AmazonOrderRequest..." + i);
             AmazonOrderResponse amazonOrderResponse = new AmazonOrderResponse();

@@ -1,6 +1,5 @@
 package com.method.invoke.callback;
 
-
 import com.method.invoke.DefaultAttachment;
 import com.method.invoke.base.BaseResponse;
 

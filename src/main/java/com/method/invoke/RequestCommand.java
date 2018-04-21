@@ -1,6 +1,6 @@
 package com.method.invoke;
 
-
+import com.amazon.commom.MarketPlace;
 import com.method.invoke.base.BaseClient;
 import com.method.invoke.base.BaseRequest;
 import com.method.invoke.base.BaseResponse;
@@ -23,6 +23,11 @@ public class RequestCommand implements Serializable, Delayed {
      * 调用方函数
      */
     private BaseClient baseClient;
+
+    /**
+     * 站点
+     */
+    private MarketPlace marketPlace;
 
     /**
      * 结果
@@ -83,6 +88,10 @@ public class RequestCommand implements Serializable, Delayed {
      * 继续执行处理器
      */
     private ExceptionReInvokeProcessor exceptionReInvokeProcessor;
+    /**
+     * sellerId
+     */
+    private String sellerId;
 
 
     public RequestCommand() {
@@ -118,6 +127,9 @@ public class RequestCommand implements Serializable, Delayed {
     }
 
     public void setBaseRequest(BaseRequest baseRequest) {
+        if (baseRequest == null) {
+            throw new RuntimeException("baseRequest can not be null");
+        }
         this.baseRequest = baseRequest;
     }
 
@@ -169,6 +181,17 @@ public class RequestCommand implements Serializable, Delayed {
         this.noReply = noReply;
     }
 
+    public MarketPlace getMarketPlace() {
+        return marketPlace;
+    }
+
+    public void setMarketPlace(MarketPlace marketPlace) {
+        if (marketPlace == null){
+            throw new RuntimeException("marketPlace can not be null");
+        }
+        this.marketPlace = marketPlace;
+    }
+
     public void countDown() {
         if (latch != null) {
             latch.countDown();
@@ -183,8 +206,15 @@ public class RequestCommand implements Serializable, Delayed {
         if (nextInvokeProcessor == null) {
             throw new RuntimeException("nextInvokeProcessor can not be null");
         }
+        if (this.sellerId == null || "".equals(this.sellerId)) {
+            throw new RuntimeException("sellerId can not be null");
+        }
+        //baseRequest should be setted before invoke setNextInvokeProcessor(nextInvokeProcessor)
+        if (baseRequest == null) {
+            throw new RuntimeException("baseRequest can not be null,baseRequest should be setted before invoke setNextInvokeProcessor(nextInvokeProcessor)");
+        }
         this.nextInvokeProcessor = nextInvokeProcessor;
-        nextInvokeTime = nextInvokeProcessor.getNextInvokeTimeMillis();
+        nextInvokeTime = nextInvokeProcessor.getNextInvokeTimeMillis(baseRequest, sellerId);
     }
 
 
@@ -194,6 +224,14 @@ public class RequestCommand implements Serializable, Delayed {
 
     public void setExceptionReInvokeProcessor(ExceptionReInvokeProcessor exceptionReInvokeProcessor) {
         this.exceptionReInvokeProcessor = exceptionReInvokeProcessor;
+    }
+
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
     }
 
     /**

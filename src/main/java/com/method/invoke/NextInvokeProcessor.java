@@ -1,5 +1,7 @@
 package com.method.invoke;
 
+import com.method.invoke.base.BaseRequest;
+
 /**
  * 下次执行时间处理器
  *
@@ -7,13 +9,10 @@ package com.method.invoke;
  * @date 2018/03/20
  */
 public interface NextInvokeProcessor {
-    /**
-     * 下一次执行时间
-     */
-    Long getNextInvokeTimeMillis();
 
     /**
-     * 当前接口限制的维度
+     * 下一次执行时间
+     * 这里的参数需要根据业务来定，一般这里放影响下次执行时间的参数
      */
-    String getKey();
+    Long getNextInvokeTimeMillis(BaseRequest baseRequest, String sellerId);
 }

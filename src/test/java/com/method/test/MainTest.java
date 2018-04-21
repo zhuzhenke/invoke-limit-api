@@ -1,5 +1,6 @@
 package com.method.test;
 
+import com.amazon.commom.MarketPlace;
 import com.method.invoke.DefaultAttachment;
 import com.method.invoke.DefaultNextInvokeProcessor;
 import com.method.invoke.ExceptionReInvokeProcessor;
@@ -14,12 +15,19 @@ import com.method.test.amazon.api.*;
  * @date 2018/03/21
  */
 public class MainTest {
+
+    public static final String testSelerId = "testSellerId";
+
     public static void main(String[] args) throws Exception {
 
 //        eee();
 //        eeeCallBack();
+        length();
+//        eeeDubble();
+    }
 
-        eeeDubble();
+    public static void length() {
+        System.out.println("GetLowestPricedOffersForASINRequest".length());
     }
 
     private static void eeeDubble() throws Exception {
@@ -37,11 +45,11 @@ public class MainTest {
         });
 
         AmazonOrderRequest amazonOrderRequest = new AmazonOrderRequest();
-        AmazonOrderResponse response = (AmazonOrderResponse) amazonTestClient.execute(amazonOrderRequest);
+        AmazonOrderResponse response = (AmazonOrderResponse) amazonTestClient.execute(amazonOrderRequest, MarketPlace.US, testSelerId);
         System.out.println("response Time:" + (System.currentTimeMillis() - start) + ";result:" + response.getResult());
 
         AmazonProductRequest amazonProductRequest = new AmazonProductRequest();
-        AmazonProductResponse amazonProductResponse = (AmazonProductResponse) amazonTestClient.execute(amazonProductRequest);
+        AmazonProductResponse amazonProductResponse = (AmazonProductResponse) amazonTestClient.execute(amazonProductRequest, MarketPlace.US, testSelerId);
         System.out.println("amazonProductResponse Time:" + (System.currentTimeMillis() - start) + ";result:" + amazonProductResponse.getResult());
 
 
@@ -63,7 +71,7 @@ public class MainTest {
         });
 
         AmazonOrderRequest amazonOrderRequest = new AmazonOrderRequest();
-        AmazonOrderResponse response = (AmazonOrderResponse) amazonTestClient.execute(amazonOrderRequest);
+        AmazonOrderResponse response = (AmazonOrderResponse) amazonTestClient.execute(amazonOrderRequest, MarketPlace.US, testSelerId);
         System.out.println(System.currentTimeMillis() - start);
     }
 
@@ -82,7 +90,7 @@ public class MainTest {
         });
 
         AmazonOrderRequest amazonOrderRequest = new AmazonOrderRequest();
-        AmazonOrderResponse response = (AmazonOrderResponse) amazonTestClient.execute(amazonOrderRequest);
+        AmazonOrderResponse response = (AmazonOrderResponse) amazonTestClient.execute(amazonOrderRequest, MarketPlace.US, testSelerId);
         System.out.println(System.currentTimeMillis() - start);
     }
 
@@ -106,7 +114,7 @@ public class MainTest {
 
         DefaultAttachment defaultAttachment = new DefaultAttachment();
         defaultAttachment.put("a", "aaa");
-        amazonTestClient.execute(amazonOrderRequest, new InvokeCallBack() {
+        amazonTestClient.execute(amazonOrderRequest, MarketPlace.US, testSelerId, new InvokeCallBack() {
             @Override
             public void invokeResult(BaseResponse response, DefaultAttachment defaultAttachment, Exception e) {
                 if (e != null) {

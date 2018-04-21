@@ -114,7 +114,7 @@ public class DefaultSystemInvoke implements SystemInvoke {
             BaseResponse baseResponse = null;
             boolean finish = false;
             try {
-                baseResponse = requestCommand.getBaseClient().executeInternal(requestCommand.getBaseRequest());
+                baseResponse = requestCommand.getBaseClient().executeInternal(requestCommand.getBaseRequest(),requestCommand.getMarketPlace());
                 finish = true;
             } catch (Exception e) {
                 logger.error("businessClient({}).execute({}) error", requestCommand.getBaseClient().getClass(), requestCommand.getClass(), e);

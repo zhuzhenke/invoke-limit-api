@@ -1,5 +1,6 @@
 package com.method.invoke.base;
 
+import com.amazon.commom.MarketPlace;
 import com.method.invoke.*;
 import com.method.invoke.callback.InvokeCallBack;
 
@@ -30,11 +31,13 @@ public abstract class BaseClient {
     /**
      * 同步方法且使用全局重试处理器
      */
-    public BaseResponse execute(BaseRequest baseRequest) throws Exception {
+    public BaseResponse execute(BaseRequest baseRequest, MarketPlace marketPlace, String sellerId) throws Exception {
         RequestCommand requestCommand = new RequestCommand();
+        requestCommand.setMarketPlace(marketPlace);
+        requestCommand.setSellerId(sellerId);
+        requestCommand.setBaseRequest(baseRequest);
         requestCommand.setNextInvokeProcessor(globalNextInvokeProcessor);
         requestCommand.setExceptionReInvokeProcessor(globalExceptionReInvokeProcessor);
-        requestCommand.setBaseRequest(baseRequest);
         requestCommand.setBaseClient(this);
 
         SystemInvoke systemInvoke = DefaultSystemInvoke.getDefaultSystemInvoke();
@@ -44,11 +47,13 @@ public abstract class BaseClient {
     /**
      * 异步方法且使用全局重试处理器
      */
-    public void execute(BaseRequest baseRequest, InvokeCallBack invokeCallBack, DefaultAttachment defaultAttachment) throws Exception {
+    public void execute(BaseRequest baseRequest, MarketPlace marketPlace, String sellerId, InvokeCallBack invokeCallBack, DefaultAttachment defaultAttachment) throws Exception {
         RequestCommand requestCommand = new RequestCommand();
+        requestCommand.setMarketPlace(marketPlace);
+        requestCommand.setSellerId(sellerId);
+        requestCommand.setBaseRequest(baseRequest);
         requestCommand.setNextInvokeProcessor(globalNextInvokeProcessor);
         requestCommand.setExceptionReInvokeProcessor(globalExceptionReInvokeProcessor);
-        requestCommand.setBaseRequest(baseRequest);
         requestCommand.setBaseClient(this);
 
         //设置回调
@@ -62,9 +67,12 @@ public abstract class BaseClient {
     /**
      * 同步方法且使用当前重试处理器
      */
-    public BaseResponse execute(BaseRequest baseRequest, NextInvokeProcessor nextInvokeProcessor,
+    public BaseResponse execute(BaseRequest baseRequest, MarketPlace marketPlace, String sellerId, NextInvokeProcessor nextInvokeProcessor,
                                 ExceptionReInvokeProcessor exceptionReInvokeProcessor) throws Exception {
         RequestCommand requestCommand = new RequestCommand();
+        requestCommand.setMarketPlace(marketPlace);
+        requestCommand.setSellerId(sellerId);
+        requestCommand.setBaseRequest(baseRequest);
         if (nextInvokeProcessor != null) {
             requestCommand.setNextInvokeProcessor(nextInvokeProcessor);
         } else {
@@ -75,7 +83,6 @@ public abstract class BaseClient {
         } else {
             requestCommand.setExceptionReInvokeProcessor(globalExceptionReInvokeProcessor);
         }
-        requestCommand.setBaseRequest(baseRequest);
         requestCommand.setBaseClient(this);
 
         SystemInvoke systemInvoke = DefaultSystemInvoke.getDefaultSystemInvoke();
@@ -85,10 +92,13 @@ public abstract class BaseClient {
     /**
      * 异步方法且使用全局重试处理器
      */
-    public void execute(BaseRequest baseRequest, InvokeCallBack invokeCallBack,
+    public void execute(BaseRequest baseRequest, MarketPlace marketPlace, String sellerId, InvokeCallBack invokeCallBack,
                         DefaultAttachment defaultAttachment, NextInvokeProcessor nextInvokeProcessor,
                         ExceptionReInvokeProcessor exceptionReInvokeProcessor) throws Exception {
         RequestCommand requestCommand = new RequestCommand();
+        requestCommand.setMarketPlace(marketPlace);
+        requestCommand.setSellerId(sellerId);
+        requestCommand.setBaseRequest(baseRequest);
         if (nextInvokeProcessor != null) {
             requestCommand.setNextInvokeProcessor(nextInvokeProcessor);
         } else {
@@ -99,7 +109,6 @@ public abstract class BaseClient {
         } else {
             requestCommand.setExceptionReInvokeProcessor(globalExceptionReInvokeProcessor);
         }
-        requestCommand.setBaseRequest(baseRequest);
         requestCommand.setBaseClient(this);
 
         //设置回调
@@ -114,9 +123,10 @@ public abstract class BaseClient {
      * 用户内部实现
      *
      * @param baseRequest 请求类
+     * @param marketPlace 站点
      * @return BaseResponse响应
      * @throws Exception 异常
      */
-    public abstract BaseResponse executeInternal(BaseRequest baseRequest) throws Exception;
+    public abstract BaseResponse executeInternal(BaseRequest baseRequest, MarketPlace marketPlace) throws Exception;
 
 }
