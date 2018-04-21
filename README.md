@@ -10,4 +10,4 @@
 注意：
 这里仅仅是测试的时候用AmazonOrderRequest和AmazonOrderResponse来模拟亚马逊的调用。
 其他具体的请求响应类会在稍后提交。
-对应的亚马逊java封装的客户端库，见https://developer.amazonservices.com.cn/doc/products/products/v20111001/java.html及其相关页面
+对应的亚马逊java封装的客户端库，见以下链接及其相关页面 https://developer.amazonservices.com.cn/doc/products/products/v20111001/java.html
