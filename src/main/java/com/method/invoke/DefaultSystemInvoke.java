@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 默认的系统后台线程工作池
@@ -17,14 +18,23 @@ public class DefaultSystemInvoke implements SystemInvoke {
     private static final Logger logger = LoggerFactory.getLogger(DefaultSystemInvoke.class);
     private DelayQueue<RequestCommand> workQueue = new DelayQueue<RequestCommand>();
     //默认最大等待时间
-    private static final int MAX_AWAIT_MILLI_SECONDS = 30 * 60 * 1000;
+    private static final int MAX_AWAIT_MILLI_SECONDS = 60 * 60 * 1000;
 
     private volatile boolean initExecutorServiceFlag = false;
-    private ExecutorService executorService = null;
+    /**
+     * 线程池工作线程数量
+     */
+    private int threadCount = 5;
+    private ThreadPoolExecutor executorService = null;
     private static DefaultSystemInvoke defaultSystemInvoke = new DefaultSystemInvoke();
+    private AtomicInteger reTryCount = new AtomicInteger(0);
 
     private DefaultSystemInvoke() {
 
+    }
+
+    public void setThreadCount(int threadCount) {
+        this.threadCount = threadCount;
     }
 
     public static SystemInvoke getDefaultSystemInvoke() {
@@ -34,11 +44,23 @@ public class DefaultSystemInvoke implements SystemInvoke {
     private void init() {
         synchronized (this) {
             if (!initExecutorServiceFlag) {
-                executorService = new ThreadPoolExecutor(5, 50,
-                        600L, TimeUnit.SECONDS,
+                if (threadCount <= 0) {
+                    threadCount = 5;
+                }
+                //使用FixedThreadPool
+                executorService = new ThreadPoolExecutor(5, 5,
+                        0L, TimeUnit.SECONDS,
                         new LinkedBlockingQueue<Runnable>(),
                         new InvokeThreadFactory(),
                         new ThreadPoolExecutor.AbortPolicy());
+                for (int i = 0; i < threadCount; i++) {
+                    executorService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            doWork();
+                        }
+                    });
+                }
                 initExecutorServiceFlag = true;
             }
         }
@@ -77,45 +99,64 @@ public class DefaultSystemInvoke implements SystemInvoke {
      * 线程池执行任务
      */
     private void doWork() {
-        RequestCommand requestCommand = null;
-        try {
-            requestCommand = workQueue.take();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return;
-        }
-        if (requestCommand == null || requestCommand.isCancel()) {
-            return;
-        }
-        BaseResponse baseResponse = null;
-        boolean finish = false;
-        try {
-            baseResponse = requestCommand.getBaseClient().executeInternal(requestCommand.getBaseRequest());
-            finish = true;
-        } catch (Exception e) {
-            logger.error("businessClient({}).execute({}) error", requestCommand.getBaseClient().getClass(), requestCommand.getClass(), e);
-            boolean reInvoke = requestCommand.getExceptionReInvokeProcessor().needReInvoke(e);
-            if (reInvoke) {
-                requestCommand.addTryTime();
-                //重新设置下次执行时间
-                requestCommand.setNextInvokeProcessor(requestCommand.getNextInvokeProcessor());
-                putWorkerQueue(requestCommand);
-            } else {
+        while (true) {
+//            printThreadPoolExecutorParams();
+            RequestCommand requestCommand = null;
+            try {
+                requestCommand = workQueue.poll(100L, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                continue;
+            }
+            if (requestCommand == null || requestCommand.isCancel()) {
+                continue;
+            }
+            BaseResponse baseResponse = null;
+            boolean finish = false;
+            try {
+                baseResponse = requestCommand.getBaseClient().executeInternal(requestCommand.getBaseRequest());
                 finish = true;
-                requestCommand.setException(e);
+            } catch (Exception e) {
+                logger.error("businessClient({}).execute({}) error", requestCommand.getBaseClient().getClass(), requestCommand.getClass(), e);
+                boolean reInvoke = requestCommand.getExceptionReInvokeProcessor().needReInvoke(e);
+                if (reInvoke) {
+                    requestCommand.addTryTime();
+                    //重新设置下次执行时间
+                    requestCommand.setNextInvokeProcessor(requestCommand.getNextInvokeProcessor());
+                    putWorkerQueue(requestCommand);
+                    System.out.println("重试次数:" + reTryCount.incrementAndGet());
+                } else {
+                    finish = true;
+                    requestCommand.setException(e);
+                }
+            }
+            if (finish) {
+                if (requestCommand.getInvokeCallBack() != null) {
+                    try {
+                        requestCommand.getInvokeCallBack().invokeResult(requestCommand.getBaseResponse(), requestCommand.getDefaultAttachment(), requestCommand.getException());
+                    } catch (Exception e) {
+                        logger.error("InvokeCallBack({}).invokeResult({}) error", requestCommand.getInvokeCallBack().getClass(), requestCommand.getClass(), e);
+                    }
+                } else {
+                    requestCommand.setBaseResponse(baseResponse);
+                    requestCommand.countDown();
+                }
             }
         }
-        if (finish) {
-            if (requestCommand.getInvokeCallBack() != null) {
-                try {
-                    requestCommand.getInvokeCallBack().invokeResult(requestCommand.getBaseResponse(), requestCommand.getDefaultAttachment(), requestCommand.getException());
-                } catch (Exception e) {
-                    logger.error("InvokeCallBack({}).invokeResult({}) error", requestCommand.getInvokeCallBack().getClass(), requestCommand.getClass(), e);
-                }
-            } else {
-                requestCommand.setBaseResponse(baseResponse);
-                requestCommand.countDown();
+    }
+
+    private void printThreadPoolExecutorParams() {
+        try {
+            if (logger.isDebugEnabled()) {
+                System.out.println("ThreadPoolExecutorParams:CompletedTaskCount:" + executorService.getCompletedTaskCount()
+                        + ";ActiveCount:" + executorService.getActiveCount()
+                        + ";PoolSize:" + executorService.getPoolSize()
+                        + ";QueueSize:" + executorService.getQueue().size()
+                        + ";TaskCount:" + executorService.getTaskCount()
+                        + ";LargestPoolSize:" + executorService.getLargestPoolSize());
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -146,15 +187,6 @@ public class DefaultSystemInvoke implements SystemInvoke {
      * 把任务放入线程池
      */
     private boolean putWorkerQueue(RequestCommand requestCommand) {
-        boolean flag = workQueue.offer(requestCommand);
-        if (flag) {
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    doWork();
-                }
-            });
-        }
-        return true;
+        return workQueue.offer(requestCommand);
     }
 }
