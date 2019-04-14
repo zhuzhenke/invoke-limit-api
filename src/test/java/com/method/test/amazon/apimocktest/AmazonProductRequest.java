@@ -1,4 +1,4 @@
-package com.method.test.amazon.api;
+package com.method.test.amazon.apimocktest;
 
 import com.method.invoke.base.BaseRequest;
 
@@ -7,5 +7,5 @@ import com.method.invoke.base.BaseRequest;
  * @date 2018/03/20
  */
 public class AmazonProductRequest implements BaseRequest {
-    
+
 }

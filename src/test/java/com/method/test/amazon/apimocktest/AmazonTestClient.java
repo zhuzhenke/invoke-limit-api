@@ -1,4 +1,4 @@
-package com.method.test.amazon.api;
+package com.method.test.amazon.apimocktest;
 
 import com.amazon.commom.MarketPlace;
 import com.method.invoke.base.BaseClient;

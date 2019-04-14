@@ -1,4 +1,4 @@
-package com.method.test.amazon.test;
+package com.method.test.amazon.apitest;
 
 import com.amazon.commom.MarketPlace;
 import com.amazon.commom.ReportType;
@@ -11,26 +11,34 @@ import com.amazonaws.mws.model.RequestReportRequest;
 import com.method.invoke.DefaultAttachment;
 import com.method.invoke.base.BaseResponse;
 import com.method.invoke.callback.InvokeCallBack;
-import com.method.test.amazon.api.AmazonOrderResponse;
+import com.method.test.amazon.apimocktest.AmazonOrderResponse;
+import org.junit.Test;
 
 import java.text.SimpleDateFormat;
 
 /**
+ *  组合模式的接口调用，如获取商品列表这种数据
+ *  通常分为3个步骤完成所有调用
+ *  （1）提交获取商品请求，拿到请求ID
+ *  （2）通过请求ID，去获取这个请求ID的报告是否完成，如已经完成，拿到报告ID
+ *  （3）通过报告ID获取商品数据
+ *
+ *  但是如果分为3次调用就会比较麻烦，所以提供了AmazonDisposableClient只需要一次调用，就可以获取最后的商品数据了
+ *
+ *  这里的用法是对于
+ *
  * @author zhuzhenke
  * @date 2018/03/26
  */
 public class AmazonDisposableTest {
-    public static void main(String[] args) throws Exception {
-//        getPortSync();
-        getPortAsync();
-    }
 
 
     private static String sellerId = "XXXXXX";
     private static String mwsAuthToken = "XXXXXX";
 
 
-    public static void getPortSync() throws Exception {
+    @Test
+    public static void getListingsDataSync() throws Exception {
         RequestReportRequest requestReportRequest = new RequestReportRequest();
         requestReportRequest.setReportType(ReportType._GET_FLAT_FILE_OPEN_LISTINGS_DATA_.name());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
@@ -40,14 +48,18 @@ public class AmazonDisposableTest {
         requestReportRequest.setMWSAuthToken(mwsAuthToken);
 
         AmazonDisposableClient amazonDisposableClient = AmazonDisposableClient.getAmazonDisposableClientInstance();
+
         DisposableRequestReportResponse response = amazonDisposableClient.execute(requestReportRequest, MarketPlace.US, sellerId);
+
+
         System.out.println(1);
 
 
     }
 
 
-    public static void getPortAsync() throws Exception {
+    @Test
+    public static void getListingsDataAsync() throws Exception {
         RequestReportRequest requestReportRequest = new RequestReportRequest();
         requestReportRequest.setReportType(ReportType._GET_SELLER_FEEDBACK_DATA_.name());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");

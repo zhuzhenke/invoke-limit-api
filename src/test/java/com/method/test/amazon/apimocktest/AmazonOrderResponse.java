@@ -1,4 +1,4 @@
-package com.method.test.amazon.api;
+package com.method.test.amazon.apimocktest;
 
 import com.method.invoke.base.BaseResponse;
 
