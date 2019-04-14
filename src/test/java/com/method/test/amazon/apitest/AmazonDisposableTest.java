@@ -25,8 +25,6 @@ import java.text.SimpleDateFormat;
  *
  *  但是如果分为3次调用就会比较麻烦，所以提供了AmazonDisposableClient只需要一次调用，就可以获取最后的商品数据了
  *
- *  这里的用法是对于
- *
  * @author zhuzhenke
  * @date 2018/03/26
  */
