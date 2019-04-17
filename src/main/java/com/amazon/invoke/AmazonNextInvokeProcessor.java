@@ -31,40 +31,45 @@ public class AmazonNextInvokeProcessor implements NextInvokeProcessor {
     @Override
     public Long getNextInvokeTimeMillis(BaseRequest baseRequest, String sellerId) {
         try {
-            HttpClient httpClient = new DefaultHttpClient();
+            //采用默认实现，频率控制不需要很准确
+            Long nextTime = NextTimeMap.get(getRequestName(baseRequest), 2000L);
+            return System.currentTimeMillis() + nextTime;
 
-            Map<String, Object> params = new HashMap<String, Object>();
-            params.put("sellerId", sellerId);
-            params.put("requestName", getRequestName(baseRequest));
-            params.put("localIp", IPUtil.getLocalIp());
-            params.put("port", IPUtil.getPort());
-            StringBuilder stringBuilder = new StringBuilder();
-            Iterator<String> iterator = params.keySet().iterator();
-            int i = 0;
-            while (iterator.hasNext()) {
-                String key = iterator.next();
-                if (i == 0) {
-                    stringBuilder.append("?").append(key).append("=").append(params.get(key));
-                } else {
-                    stringBuilder.append("&").append(key).append("=").append(params.get(key));
-                }
-                i++;
-            }
-            //这里调用统一控制中心的web接口，获取到当前request的执行时间
-            HttpGet httpGet = new HttpGet("http://XXX.com/XXXtime" + stringBuilder.toString());
-
-            RequestConfig requestConfig = RequestConfig.custom()
-                    .setConnectTimeout(2000).setConnectionRequestTimeout(2000)
-                    .setSocketTimeout(2000).build();
-            httpGet.setConfig(requestConfig);
-            HttpResponse res = httpClient.execute(httpGet);
-            switch (res.getStatusLine().getStatusCode()) {
-                case 200:
-                    String body = EntityUtils.toString(res.getEntity());
-                    return Long.valueOf(body);
-                default:
-                    return System.currentTimeMillis() + 2000;
-            }
+            //TODO 接口频率控制实现，也可以不实现
+//            HttpClient httpClient = new DefaultHttpClient();
+//
+//            Map<String, Object> params = new HashMap<String, Object>();
+//            params.put("sellerId", sellerId);
+//            params.put("requestName", getRequestName(baseRequest));
+//            params.put("localIp", IPUtil.getLocalIp());
+//            params.put("port", IPUtil.getPort());
+//            StringBuilder stringBuilder = new StringBuilder();
+//            Iterator<String> iterator = params.keySet().iterator();
+//            int i = 0;
+//            while (iterator.hasNext()) {
+//                String key = iterator.next();
+//                if (i == 0) {
+//                    stringBuilder.append("?").append(key).append("=").append(params.get(key));
+//                } else {
+//                    stringBuilder.append("&").append(key).append("=").append(params.get(key));
+//                }
+//                i++;
+//            }
+//            //这里调用统一控制中心的web接口，获取到当前request的执行时间
+//            HttpGet httpGet = new HttpGet("http://XXX.com/XXXtime" + stringBuilder.toString());
+//
+//            RequestConfig requestConfig = RequestConfig.custom()
+//                    .setConnectTimeout(2000).setConnectionRequestTimeout(2000)
+//                    .setSocketTimeout(2000).build();
+//            httpGet.setConfig(requestConfig);
+//            HttpResponse res = httpClient.execute(httpGet);
+//            switch (res.getStatusLine().getStatusCode()) {
+//                case 200:
+//                    String body = EntityUtils.toString(res.getEntity());
+//                    return Long.valueOf(body);
+//                default:
+//                    return System.currentTimeMillis() + 2000;
+//            }
         } catch (Exception e) {
             logger.error("AmazonNextInvokeProcessor getNextInvokeTimeMillis error,baseRequest:{},sellerId:{}", getRequestName(baseRequest), sellerId, e);
             Long nextTime = NextTimeMap.get(getRequestName(baseRequest), 2000L);
