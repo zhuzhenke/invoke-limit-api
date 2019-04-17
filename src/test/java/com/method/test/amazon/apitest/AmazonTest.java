@@ -2,9 +2,7 @@ package com.method.test.amazon.apitest;
 
 import com.amazon.commom.MarketPlace;
 import com.amazon.invoke.AmazonClient;
-import com.amazonservices.mws.products.model.GetMyPriceForSKURequest;
-import com.amazonservices.mws.products.model.GetMyPriceForSKUResponse;
-import com.amazonservices.mws.products.model.SellerSKUListType;
+import com.amazonservices.mws.products.model.*;
 import com.method.invoke.DefaultAttachment;
 import com.method.invoke.base.BaseResponse;
 import com.method.invoke.callback.InvokeCallBack;
@@ -26,9 +24,8 @@ public class AmazonTest {
 
 
     @Test
-    private static void getPriceSync() {
+    public void getPriceSync() {
         try {
-
             GetMyPriceForSKURequest getMyPriceForSKURequest = new GetMyPriceForSKURequest();
 
             //代理模式，如搭建香港服务器加快访问
@@ -61,7 +58,7 @@ public class AmazonTest {
     }
 
     @Test
-    private static void getPriceAsync() {
+    public void getPriceAsync() {
 
         try {
 

@@ -17,13 +17,13 @@ import org.junit.Test;
 import java.text.SimpleDateFormat;
 
 /**
- *  组合模式的接口调用，如获取商品列表这种数据
- *  通常分为3个步骤完成所有调用
- *  （1）提交获取商品请求，拿到请求ID
- *  （2）通过请求ID，去获取这个请求ID的报告是否完成，如已经完成，拿到报告ID
- *  （3）通过报告ID获取商品数据
- *
- *  但是如果分为3次调用就会比较麻烦，所以提供了AmazonDisposableClient只需要一次调用，就可以获取最后的商品数据了
+ * 组合模式的接口调用，如获取商品列表这种数据
+ * 通常分为3个步骤完成所有调用
+ * （1）提交获取商品请求，拿到请求ID
+ * （2）通过请求ID，去获取这个请求ID的报告是否完成，如已经完成，拿到报告ID
+ * （3）通过报告ID获取商品数据
+ * <p>
+ * 但是如果分为3次调用就会比较麻烦，所以提供了AmazonDisposableClient只需要一次调用，就可以获取最后的商品数据了
  *
  * @author zhuzhenke
  * @date 2018/03/26
@@ -36,7 +36,7 @@ public class AmazonDisposableTest {
 
 
     @Test
-    public static void getListingsDataSync() throws Exception {
+    public void getListingsDataSync() throws Exception {
         RequestReportRequest requestReportRequest = new RequestReportRequest();
         requestReportRequest.setReportType(ReportType._GET_FLAT_FILE_OPEN_LISTINGS_DATA_.name());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
@@ -57,7 +57,7 @@ public class AmazonDisposableTest {
 
 
     @Test
-    public static void getListingsDataAsync() throws Exception {
+    public void getListingsDataAsync() throws Exception {
         RequestReportRequest requestReportRequest = new RequestReportRequest();
         requestReportRequest.setReportType(ReportType._GET_SELLER_FEEDBACK_DATA_.name());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
